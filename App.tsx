@@ -1,32 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-// Définition du type pour TypeScript
-interface DjangoData {
-  message: string;
+// L'interface représente UN SEUL message
+interface Note {
+  id: number;
+  texte: string;
 }
 
 export default function App() {
-  const [data, setData] = useState<DjangoData | null>(null);
+  // On définit que data est un TABLEAU de Notes : Note[]
+  const [data, setData] = useState<Note[]>([]);
 
   useEffect(() => {
-    // Utilise ton IP locale ici (pas localhost !)
-    fetch('http://TON_IP:8000/api/hello/')
+    fetch('http://192.168.1.142:8000/api/hello/')
       .then(res => res.json())
       .then(json => setData(json))
-      .catch(err => console.error("Erreur:", err));
+      .catch(err => console.error(err));
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>
-        {data ? data.message : "Connexion au serveur..."}
-      </Text>
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Mes Messages Dynamiques</Text>
+      
+      {/* LA BOUCLE MAGIQUE : Pour chaque "item" dans "data" */}
+      {data.map((item) => (
+        <View key={item.id} style={styles.card}>
+          <Text style={styles.text}>{item.texte}</Text>
+        </View>
+      ))}
+      
+    </ScrollView>
   );
 }
 
+// --- LE STYLE (Design) ---
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
-  text: { fontSize: 20, color: 'blue' }
+  container: { padding: 50, alignItems: 'center' },
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 20 },
+  card: {
+    backgroundColor: '#e1f5fe',
+    padding: 15,
+    borderRadius: 8,
+    width: '100%',
+    marginBottom: 10,
+  },
+  text: { fontSize: 18, color: '#01579b' }
 });
